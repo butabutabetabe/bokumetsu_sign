@@ -1,0 +1,80 @@
+<style>
+body {
+  font-family:"Zen Kurenaido";
+	background: black;
+	font-size: 10.5pt;
+  background-color: rgba(245, 245, 245, 0.9);
+}
+.container{
+  display:grid;
+  padding:10px;
+  place-content:center;
+  place-items:center;
+}
+.button-Grid{
+  display:grid;
+  grid-template-rows:50px 30px 50px;
+  grid-template-columns:150px 150px 150px 150px;
+}
+
+.title-Grid{
+  display:grid;
+  grid-template-rows:50px;
+  grid-template-columns:100px 100px 100px 100px 100px 100px;
+}
+
+#title{
+  font-size:30px;
+  grid-row:1;
+  grid-column:1;
+}
+
+#clear{
+  grid-row:1;
+  grid-column:1;
+}
+
+#send{
+  grid-row:1;
+  grid-column:4;
+  color: #fff;
+  background: #f56500;
+}
+
+canvas {
+	background: #fff;
+  borderRadius: '7px';
+  touchAction: 'none';
+  width:600px;
+  height:200px:
+}
+
+.dot1 {
+	display: inline-block;
+	width: 0;
+	height: 0;
+	border-style: solid;
+	border-color: #222;
+	vertical-align: middle;
+}
+
+@media screen and (max-width : 599px){
+  canvas {
+  width:80%;
+  height:auto;
+}
+#title{
+    grid-row:1;
+  grid-column:2;
+}
+#clear{
+   grid-row:1;
+  grid-column:1/6;
+}
+#send{
+    grid-row:3;
+  grid-column:1/6;
+}
+
+}
+</style>

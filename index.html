@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+        <?!= HtmlService.createHtmlOutputFromFile("css").getContent(); ?>
+  <script>
+const App = {
+	canvas: null,         /* canvas 要素 */
+	ctx: null,            /* canvas のコンテキスト */
+	isMouseDown: false,   /* マウスボタンを押しているか？ */
+	pen : {
+		color : "#2d2d2d",   /* ペンの色 */
+		width : 5,       /* ペンの太さ */
+	},
+	prevX : 0,            /* 前回のマウス座標 */
+	prevY : 0,            /* 前回のマウス座標 */
+};
+
+App.init = function(){
+	const canvas = document.querySelector("#CANVAS");
+	App.canvas = canvas;
+	App.ctx = App.canvas.getContext("2d");
+	App.clearCanvas();
+  document.getElementById("send").disabled = true;
+
+	//canvas にマウスイベントを付ける。
+	canvas.addEventListener("mousemove", event => {
+		if (App.isMouseDown){
+			App.drawLine(App.prevX, App.prevY, event.offsetX, event.offsetY);
+			App.prevX = event.offsetX;
+			App.prevY = event.offsetY;
+		}
+	});
+
+	canvas.addEventListener("mousedown", event => {
+		App.isMouseDown = true;
+		App.prevX = event.offsetX;
+		App.prevY = event.offsetY;
+	});
+
+	canvas.addEventListener("mouseup", event => App.isMouseDown = false );
+
+	// "mouseout" の処理は面倒な話がある。
+	// マウスが canvas の外に出て、外でボタンを離したらどうするか？など。
+	canvas.addEventListener("mouseout", event => App.isMouseDown = false );
+
+
+	//canvas にタッチイベントを付ける。
+	canvas.addEventListener("touchmove", event => {
+		//デフォルトの動作を無効にする。
+		event.preventDefault();
+		if (App.isMouseDown){
+			//最初の Touch オブジェクトだけ処理
+			const ev0 = event.changedTouches[0];
+			const canvas = App.canvas;
+			const x = ev0.pageX - canvas.offsetLeft;
+			const y = ev0.pageY - canvas.offsetTop;
+			App.drawLine(App.prevX, App.prevY, x, y);
+			App.prevX = x;
+			App.prevY = y;
+		}
+	});
+
+	canvas.addEventListener("touchstart", event => {
+		App.isMouseDown = true;
+		//最初の Touch オブジェクトだけ処理
+		const ev0 = event.changedTouches[0];
+		App.prevX = ev0.pageX - canvas.offsetLeft;
+		App.prevY = ev0.pageY - canvas.offsetTop;
+	});
+
+	canvas.addEventListener("touchend", event => App.isMouseDown = false );
+};
+
+/* 線を描く */
+App.drawLine = function(x0, y0, x1, y1){
+	const ctx = App.ctx;
+	ctx.lineWidth = App.pen.width;
+	ctx.strokeStyle = App.pen.color;
+	ctx.lineJoin = "round";           //角を丸くする
+	ctx.beginPath();
+	ctx.moveTo(x0, y0);
+	ctx.lineTo(x1, y1);
+	ctx.closePath();
+	ctx.stroke();
+  document.getElementById("send").disabled = false;
+};
+/* キャンバスを白で塗る */
+App.clearCanvas = function(){
+	App.ctx.fillStyle = "#fff";
+	App.ctx.fillRect(0, 0, App.canvas.width, App.canvas.height);
+  document.getElementById("send").disabled = true;
+};
+
+/* 画像ファイルを保存する */
+App.writeFile = function(){
+	try{
+      const canvas = App.canvas;
+
+      if(canvas != null){
+        const success = () => {
+        alert('送信完了♥契約完了♥');
+        document.getElementById("send").disabled = true;
+      };
+      const failure = () => {
+        alert('失敗♥送らなくてよかったね♥');
+      };
+
+      google.script.run.
+      withSuccessHandler(success).
+      withFailureHandler(failure).
+      saveSignatureImage(canvas.toDataURL('image/png'));
+
+      }else{
+          alert('白紙なんだけどー♥自分の名前分からないのかなー♥')
+      }
+	}
+	catch(e){
+		console.log(e);
+		alert("失敗♥:"+e);
+	}
+};
+
+
+
+/* 初期化処理 */
+window.onload = event => App.init();
+</script> 
+</head>
+<body>
+  <div class="container">
+  <div class="title-Grid">
+     <div id="title">署名♥</div>
+  </div>
+  <canvas id="CANVAS" width="600" height="200"></canvas>
+  <br>
+  <div class="button-Grid">
+  <button id="clear" onclick="App.clearCanvas()">クリア</button>
+  <button id="send" onclick="App.writeFile()">送信♥</button>
+  </div>
+  </div>
+</body>
+</html>
